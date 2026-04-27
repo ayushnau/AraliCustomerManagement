@@ -144,10 +144,11 @@ export default function App() {
                       </td>
                     </tr>
                   ) : (
-                    customers.map((c) => (
+                    customers.map((c, i) => (
                       <CustomerRow
                         key={c.id}
                         customer={c}
+                        index={i + 1}
                         onDelete={handleDeleted}
                         compact={isCompact}
                       />

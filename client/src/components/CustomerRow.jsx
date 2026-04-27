@@ -3,7 +3,7 @@ import { API, initials, fmtDate } from "../utils/helpers";
 import { TrashIcon } from "./Icons";
 import ConfirmModal from "./ConfirmModal";
 
-export default function CustomerRow({ customer, onDelete, compact }) {
+export default function CustomerRow({ customer, index, onDelete, compact }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = async () => {
@@ -24,7 +24,7 @@ export default function CustomerRow({ customer, onDelete, compact }) {
             </div>
             <div className="leading-tight">
               <div className="font-medium text-text">{customer.name}</div>
-              <div className="font-mono text-[11px] text-text-3">{customer.id}</div>
+              <div className="font-mono text-[11px] text-text-3">#{String(index).padStart(3, "0")}</div>
             </div>
           </div>
         </td>
