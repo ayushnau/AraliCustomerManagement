@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════
+   CSS Variables — these MUST stay as CSS because
+   they change dynamically via theme/accent classes.
+   Tailwind references them via tailwind.config.js.
+   ═══════════════════════════════════════════════ */
+
+/* ── Accent palettes ── */
+.accent-indigo  { --accent: #4f46e5; --accent-light: #e0e7ff; --accent-hover: #4338ca; --accent-text: #fff; }
+.accent-emerald { --accent: #059669; --accent-light: #d1fae5; --accent-hover: #047857; --accent-text: #fff; }
+.accent-slate   { --accent: #475569; --accent-light: #e2e8f0; --accent-hover: #334155; --accent-text: #fff; }
+.accent-amber   { --accent: #d97706; --accent-light: #fef3c7; --accent-hover: #b45309; --accent-text: #fff; }
+
+/* ── Light theme ── */
+.theme-light {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text: #1a1a2e;
+  --text-2: #6b7280;
+  --text-3: #9ca3af;
+  --hover-row: #f8f9fc;
+  --stripe: #fafbfd;
+  --topbar-bg: #ffffff;
+  --topbar-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --kbd-bg: #f3f4f6;
+  --kbd-border: #d1d5db;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --toast-bg: #1a1a2e;
+  --toast-text: #fff;
+}
+
+/* ── Dark theme ── */
+.theme-dark {
+  --bg: #0f1117;
+  --surface: #1a1c25;
+  --border: #2a2d38;
+  --text: #e4e5e9;
+  --text-2: #8b8d97;
+  --text-3: #5c5e69;
+  --hover-row: #22242e;
+  --stripe: #1e2029;
+  --topbar-bg: #1a1c25;
+  --topbar-border: #2a2d38;
+  --input-bg: #22242e;
+  --input-border: #3a3d48;
+  --kbd-bg: #22242e;
+  --kbd-border: #3a3d48;
+  --danger: #ef4444;
+  --danger-light: #2d1b1b;
+  --toast-bg: #e4e5e9;
+  --toast-text: #0f1117;
+}
