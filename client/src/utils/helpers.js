@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-export const API = `${process.env.REACT_APP_API_URL}/customers`;
+export const API = `${process.env.VITE_API_URL}/customers`;
 
 export function initials(name) {
   return name

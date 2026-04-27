@@ -40,7 +40,7 @@ CustomerManagement/
 │       ├── gracefulShutdown.js    # SIGTERM/SIGINT + uncaught error handling
 │       └── httpError.js           # Custom HTTP error class
 ├── client/                        # Frontend React app
-│   ├── .env                       # REACT_APP_API_URL
+│   ├── .env                       # VITE_API_URL
 │   ├── tailwind.config.js         # Tailwind theme with CSS variable references
 │   └── src/
 │       ├── App.js                 # Main dashboard layout and state
@@ -107,7 +107,7 @@ LOG_FORMAT=dev
 The frontend `.env` is already configured:
 
 ```env
-REACT_APP_API_URL=http://localhost:5001
+VITE_API_URL=http://localhost:5001
 ```
 
 ### 4. Start the servers
