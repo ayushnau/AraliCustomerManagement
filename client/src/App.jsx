@@ -19,12 +19,16 @@ export default function App() {
     const defaults = { mode: "light", accent: "indigo", formPlacement: "side", density: "comfortable" };
     try {
       const saved = localStorage.getItem("tweaks");
-      return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
-    } catch { return defaults; }
+      if (saved) return { ...defaults, ...JSON.parse(saved) };
+    } catch {
+      return defaults
+    }
+    return defaults;
   });
 
   useEffect(() => {
-    localStorage.setItem("tweaks", JSON.stringify(tweaks));
+    const { _modalOpen, ...toSave } = tweaks;
+    localStorage.setItem("tweaks", JSON.stringify(toSave));
   }, [tweaks]);
 
   const addToast = useCallback((message, type = "success") => {
