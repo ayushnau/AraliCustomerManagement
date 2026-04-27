@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
-function generateId(prefix = "c_") {
-  return prefix + crypto.randomBytes(2).toString("hex");
+function generateId() {
+  return crypto.randomUUID();
 }
 
 module.exports = generateId;
