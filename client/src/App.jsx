@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { API } from "./utils/helpers";
 import { SearchIcon, BrandIcon, GearIcon } from "./components/Icons";
 import TweaksPanel from "./components/TweaksPanel";
@@ -7,9 +7,12 @@ import CustomerRow from "./components/CustomerRow";
 import Toasts from "./components/Toasts";
 import "./App.css";
 
+const PAGE_SIZE = 10;
+
 export default function App() {
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [toasts, setToasts] = useState([]);
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [tweaks, setTweaks] = useState({
@@ -46,7 +49,18 @@ export default function App() {
     addToast("Customer deleted", "info");
   };
 
+  // Reset to page 1 on search
+  useEffect(() => { setPage(1); }, [search]);
+
   const total = customers.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safeePage = Math.min(page, totalPages);
+  const paged = useMemo(
+    () => customers.slice((safeePage - 1) * PAGE_SIZE, safeePage * PAGE_SIZE),
+    [customers, safeePage]
+  );
+  const startIndex = (safeePage - 1) * PAGE_SIZE;
+
   const themeClass = `theme-${tweaks.mode} accent-${tweaks.accent}`;
   const isCompact = tweaks.density === "compact";
   const layoutDir = tweaks.formPlacement === "top" ? "flex-col" : "flex-row";
@@ -137,18 +151,18 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.length === 0 ? (
+                  {paged.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-10 px-4 text-text-3 text-sm">
                         No customers yet — add one using the form.
                       </td>
                     </tr>
                   ) : (
-                    customers.map((c, i) => (
+                    paged.map((c, i) => (
                       <CustomerRow
                         key={c.id}
                         customer={c}
-                        index={i + 1}
+                        index={startIndex + i + 1}
                         onDelete={handleDeleted}
                         compact={isCompact}
                       />
@@ -159,9 +173,30 @@ export default function App() {
             </div>
 
             {/* Table footer */}
-            <div className="flex justify-between px-5 py-3 border-t border-border text-xs">
+            <div className="flex items-center justify-between px-5 py-3 border-t border-border text-xs">
               <span className="font-mono text-text-3">length = {total}</span>
-              <span className="text-text-3">Showing {total} of {total}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-2.5 py-1 rounded border border-border bg-transparent text-text-2 cursor-pointer text-xs font-sans transition-all duration-150 hover:bg-stripe disabled:opacity-30 disabled:cursor-not-allowed"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={safeePage <= 1}
+                >
+                  Prev
+                </button>
+                <span className="text-text-3">
+                  Page {safeePage} of {totalPages}
+                </span>
+                <button
+                  className="px-2.5 py-1 rounded border border-border bg-transparent text-text-2 cursor-pointer text-xs font-sans transition-all duration-150 hover:bg-stripe disabled:opacity-30 disabled:cursor-not-allowed"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={safeePage >= totalPages}
+                >
+                  Next
+                </button>
+              </div>
+              <span className="text-text-3">
+                Showing {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, total)} of {total}
+              </span>
             </div>
           </div>
         </section>
