@@ -15,12 +15,17 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [toasts, setToasts] = useState([]);
   const [tweaksOpen, setTweaksOpen] = useState(false);
-  const [tweaks, setTweaks] = useState({
-    mode: "light",
-    accent: "indigo",
-    formPlacement: "side",
-    density: "comfortable",
+  const [tweaks, setTweaks] = useState(() => {
+    const defaults = { mode: "light", accent: "indigo", formPlacement: "side", density: "comfortable" };
+    try {
+      const saved = localStorage.getItem("tweaks");
+      return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+    } catch { return defaults; }
   });
+
+  useEffect(() => {
+    localStorage.setItem("tweaks", JSON.stringify(tweaks));
+  }, [tweaks]);
 
   const addToast = useCallback((message, type = "success") => {
     const id = Date.now();
