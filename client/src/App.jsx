@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { API } from "./utils/helpers";
 import { SearchIcon, BrandIcon, GearIcon } from "./components/Icons";
 import TweaksPanel from "./components/TweaksPanel";
@@ -33,24 +33,27 @@ export default function App() {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3000);
   }, []);
 
-  const fetchCustomers = useCallback(async () => {
-    const url = search ? `${API}?q=${encodeURIComponent(search)}` : API;
+  const fetchCustomers = useCallback(async (query = "") => {
+    const url = query ? `${API}?q=${encodeURIComponent(query)}` : API;
     const res = await fetch(url);
     const data = await res.json();
     setCustomers(data);
-  }, [search]);
+  }, []);
 
+  const debounceRef = useRef(null);
   useEffect(() => {
-    fetchCustomers();
-  }, [fetchCustomers]);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchCustomers(search), 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search, fetchCustomers]);
 
   const handleAdded = () => {
-    fetchCustomers();
+    fetchCustomers(search);
     addToast("Customer added");
   };
 
   const handleDeleted = () => {
-    fetchCustomers();
+    fetchCustomers(search);
     addToast("Customer deleted", "info");
   };
 
