@@ -10,15 +10,15 @@ A full-stack web application for managing customers. Add, view, search, and dele
 
 ## Tech Stack
 
-| Layer      | Technology                                         |
-| ---------- | -------------------------------------------------- |
-| Frontend   | React 19, CSS (custom, no library)                 |
-| Backend    | Node.js, Express 5                                 |
-| Runtime    | [Bun](https://bun.sh) (v1.0+)                     |
-| Validation | [Zod](https://zod.dev) (v4)                        |
-| Date/Time  | [Luxon](https://moment.github.io/luxon/) (Asia/Kolkata) |
-| Logging    | Morgan                                             |
-| Storage    | In-memory array (no database)                      |
+| Layer      | Technology                                               |
+| ---------- | -------------------------------------------------------- |
+| Frontend   | React 19, Tailwind CSS 3                                 |
+| Backend    | Node.js, Express 5                                       |
+| Runtime    | [Bun](https://bun.sh) (v1.0+)                           |
+| Validation | [Zod](https://zod.dev) (v4)                              |
+| Date/Time  | [Luxon](https://moment.github.io/luxon/) (Asia/Kolkata)  |
+| Logging    | Morgan                                                   |
+| Storage    | In-memory array (no database)                            |
 
 ---
 
@@ -26,23 +26,34 @@ A full-stack web application for managing customers. Add, view, search, and dele
 
 ```
 CustomerManagement/
-├── server/                   # Backend API
-│   ├── index.js              # Entry point — starts server, graceful shutdown
-│   ├── app.js                # Express app factory (middleware, routes)
-│   ├── .env                  # Environment variables (PORT, CORS, logging)
+├── server/                        # Backend API
+│   ├── index.js                   # Entry point — starts server, graceful shutdown
+│   ├── app.js                     # Express app factory (middleware, routes)
+│   ├── .env.example               # Environment variable reference
 │   ├── routes/
-│   │   └── customers.js      # GET / POST / DELETE /customers
+│   │   └── customers.js           # GET / POST / DELETE /customers
 │   ├── middleware/
-│   │   └── errorHandler.js   # 404 handler + global error handler
+│   │   └── errorHandler.js        # 404 handler + global error handler
 │   └── utils/
-│       ├── corsOptions.js    # CORS origin whitelist from env
-│       ├── generateId.js     # Short hex ID generator (c_xxxx)
-│       ├── gracefulShutdown.js # SIGTERM/SIGINT + uncaught error handling
-│       └── httpError.js      # Custom HTTP error class
-├── client/                   # Frontend React app
+│       ├── corsOptions.js         # CORS origin whitelist from env
+│       ├── generateId.js          # Short hex ID generator
+│       ├── gracefulShutdown.js    # SIGTERM/SIGINT + uncaught error handling
+│       └── httpError.js           # Custom HTTP error class
+├── client/                        # Frontend React app
+│   ├── .env                       # REACT_APP_API_URL
+│   ├── tailwind.config.js         # Tailwind theme with CSS variable references
 │   └── src/
-│       ├── App.js            # Main component (form, table, tweaks panel)
-│       └── App.css           # Full stylesheet with theming support
+│       ├── App.js                 # Main dashboard layout and state
+│       ├── App.css                # Tailwind directives + CSS variables (theming)
+│       ├── components/
+│       │   ├── Icons.js           # SVG icon components
+│       │   ├── CustomerForm.js    # Add customer form with validation
+│       │   ├── CustomerRow.js     # Table row with delete action
+│       │   ├── ConfirmModal.js    # Delete confirmation dialog
+│       │   ├── TweaksPanel.js     # Theme/layout settings panel
+│       │   └── Toasts.js          # Auto-dismissing notifications
+│       └── utils/
+│           └── helpers.js         # API URL, initials(), fmtDate()
 └── README.md
 ```
 
@@ -78,7 +89,14 @@ npm install
 
 ### 3. Configure environment
 
-The backend ships with a `.env` file pre-configured for local development:
+Copy the example env file for the backend:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Default values (no changes needed for local use):
 
 ```env
 PORT=5001
@@ -86,7 +104,11 @@ CORS_ORIGINS=http://localhost:3000
 LOG_FORMAT=dev
 ```
 
-No changes needed for local use.
+The frontend `.env` is already configured:
+
+```env
+REACT_APP_API_URL=http://localhost:5001
+```
 
 ### 4. Start the servers
 
@@ -163,9 +185,9 @@ Response: `200 OK` with the deleted customer object, or `404` if not found.
 ## Frontend Features
 
 - **Add Customer Form** — validated inputs with real-time error clearing, 10-digit phone validation with auto `+91` prefix
-- **Customer Table** — displays name (with avatar initials), short ID, email (mailto link), phone, and date added (IST via Luxon)
+- **Customer Table** — displays name (with avatar initials), email (mailto link), phone, and date added (IST via Luxon)
 - **Search** — live search across name, email, and phone fields
-- **Delete** — remove customers with a single click
+- **Delete** — confirmation modal before removing a customer
 - **Toast Notifications** — success/info feedback on add and delete
 - **Tweaks Panel** (gear icon in topbar):
   - **Mode** — Light / Dark theme
@@ -181,8 +203,8 @@ Response: `200 OK` with the deleted customer object, or `404` if not found.
 - **In-memory storage** — data resets on server restart, as specified in the assignment. No database setup needed.
 - **Express 5** — native async error handling in route handlers, no need for wrapper middleware.
 - **Zod validation** — schema-based input validation with clear, per-field error messages returned to the client.
+- **Tailwind CSS** — utility-first styling with CSS variables for dynamic theming (light/dark, accents).
 - **Luxon + Asia/Kolkata** — all "Added" dates are displayed in IST for consistent Indian timezone formatting.
-- **Short IDs** (`c_xxxx`) — 2-byte hex IDs for readability in the UI. Sufficient for in-memory demo scale.
 - **CORS whitelist** — only the configured frontend origin can call the API (`CORS_ORIGINS` in `.env`).
 - **Graceful shutdown** — the server handles SIGTERM/SIGINT and drains connections before exiting.
 
