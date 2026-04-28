@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { API } from "./utils/helpers";
-import { SearchIcon, BrandIcon, GearIcon } from "./components/Icons";
+import Topbar from "./components/Topbar";
 import TweaksPanel from "./components/TweaksPanel";
 import CustomerForm from "./components/CustomerForm";
-import CustomerRow from "./components/CustomerRow";
+import CustomerTable from "./components/CustomerTable";
 import Toasts from "./components/Toasts";
 import "./App.css";
 
@@ -21,7 +21,7 @@ export default function App() {
       const saved = localStorage.getItem("tweaks");
       if (saved) return { ...defaults, ...JSON.parse(saved) };
     } catch {
-      return defaults
+      return defaults;
     }
     return defaults;
   });
@@ -51,6 +51,8 @@ export default function App() {
     return () => clearTimeout(debounceRef.current);
   }, [search, fetchCustomers]);
 
+  useEffect(() => { setPage(1); }, [search]);
+
   const handleAdded = () => {
     fetchCustomers(search);
     addToast("Customer added");
@@ -61,17 +63,14 @@ export default function App() {
     addToast("Customer deleted", "info");
   };
 
-  // Reset to page 1 on search
-  useEffect(() => { setPage(1); }, [search]);
-
   const total = customers.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safeePage = Math.min(page, totalPages);
+  const safePage = Math.min(page, totalPages);
   const paged = useMemo(
-    () => customers.slice((safeePage - 1) * PAGE_SIZE, safeePage * PAGE_SIZE),
-    [customers, safeePage]
+    () => customers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [customers, safePage]
   );
-  const startIndex = (safeePage - 1) * PAGE_SIZE;
+  const startIndex = (safePage - 1) * PAGE_SIZE;
 
   const themeClass = `theme-${tweaks.mode} accent-${tweaks.accent}`;
   const isCompact = tweaks.density === "compact";
@@ -79,41 +78,12 @@ export default function App() {
 
   return (
     <div className={`${themeClass} min-h-screen bg-app text-text transition-colors duration-150 font-sans text-sm leading-normal antialiased`}>
-      {/* ── Topbar ── */}
-      <header className="sticky top-0 z-50 flex items-center gap-4 h-14 px-6 bg-topbar-bg border-b border-topbar-border">
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="text-accent flex" aria-hidden="true">
-            <BrandIcon />
-          </div>
-          <div>
-            <div className="font-bold text-[15px] leading-tight text-text">Admin</div>
-            <div className="text-[11px] text-text-3 uppercase tracking-wide">Customer Management</div>
-          </div>
-        </div>
+      <Topbar
+        search={search}
+        onSearchChange={setSearch}
+        onOpenTweaks={() => setTweaksOpen(true)}
+      />
 
-        <div className="flex-1 max-w-[420px] flex items-center gap-2 px-3 h-9 bg-input-bg border border-input-border rounded-full text-text-3 transition-colors duration-150 focus-within:border-accent focus-within:text-text">
-          <SearchIcon />
-          <input
-            type="text"
-            placeholder="Search name, email, phone…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 border-none outline-none bg-transparent text-[13px] text-text font-sans placeholder:text-text-3"
-          />
-        </div>
-
-        <div className="ml-auto flex items-center gap-3 shrink-0">
-          <button
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-transparent rounded-md bg-transparent text-text-3 cursor-pointer text-xs font-sans transition-all duration-150 hover:text-text-2 hover:bg-stripe"
-            aria-label="Open tweaks"
-            onClick={() => setTweaksOpen(true)}
-          >
-            <GearIcon />
-          </button>
-        </div>
-      </header>
-
-      {/* ── Main layout ── */}
       <main className={`flex ${layoutDir} p-6 gap-6 min-h-[calc(100vh-3.5rem)] max-md:flex-col`}>
         {tweaks.formPlacement === "modal" ? (
           <>
@@ -138,79 +108,17 @@ export default function App() {
         )}
 
         <section className="flex-1 min-w-0">
-          <div className="bg-surface border border-border rounded-[10px] overflow-hidden">
-            {/* Table header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-base font-semibold text-text">Customers</h2>
-                <span className="inline-flex items-center justify-center min-w-[24px] h-[22px] px-2 rounded-xl bg-accent-light text-accent text-xs font-semibold font-mono">
-                  {total}
-                </span>
-              </div>
-              <div />
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-stripe">
-                    <th className="pl-5 pr-4 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-text-3 whitespace-nowrap border-b border-border">Name</th>
-                    <th className="px-4 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-text-3 whitespace-nowrap border-b border-border">Email</th>
-                    <th className="px-4 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-text-3 whitespace-nowrap border-b border-border">Phone</th>
-                    <th className="px-4 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-text-3 whitespace-nowrap border-b border-border w-[90px]">Added</th>
-                    <th className="px-4 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wide text-text-3 whitespace-nowrap border-b border-border w-[100px]" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {paged.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="text-center py-10 px-4 text-text-3 text-sm">
-                        No customers yet — add one using the form.
-                      </td>
-                    </tr>
-                  ) : (
-                    paged.map((c, i) => (
-                      <CustomerRow
-                        key={c.id}
-                        customer={c}
-                        index={startIndex + i + 1}
-                        onDelete={handleDeleted}
-                        compact={isCompact}
-                      />
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Table footer */}
-            <div className="flex items-center justify-between px-5 py-3 border-t border-border text-xs">
-              <span className="font-mono text-text-3">length = {total}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  className="px-2.5 py-1 rounded border border-border bg-transparent text-text-2 cursor-pointer text-xs font-sans transition-all duration-150 hover:bg-stripe disabled:opacity-30 disabled:cursor-not-allowed"
-                  onClick={() => setPage((p) => p - 1)}
-                  disabled={safeePage <= 1}
-                >
-                  Prev
-                </button>
-                <span className="text-text-3">
-                  Page {safeePage} of {totalPages}
-                </span>
-                <button
-                  className="px-2.5 py-1 rounded border border-border bg-transparent text-text-2 cursor-pointer text-xs font-sans transition-all duration-150 hover:bg-stripe disabled:opacity-30 disabled:cursor-not-allowed"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={safeePage >= totalPages}
-                >
-                  Next
-                </button>
-              </div>
-              <span className="text-text-3">
-                Showing {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, total)} of {total}
-              </span>
-            </div>
-          </div>
+          <CustomerTable
+            customers={paged}
+            startIndex={startIndex}
+            onDelete={handleDeleted}
+            compact={isCompact}
+            page={safePage}
+            totalPages={totalPages}
+            total={total}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </section>
       </main>
 
