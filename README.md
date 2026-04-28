@@ -6,19 +6,24 @@ A full-stack web application for managing customers. Add, view, search, and dele
 
 > Loom walkthrough: _[paste your Loom link here]_
 
+**Live URLs:**
+- Frontend: https://customerfrontend.onrender.com
+- Backend: https://aralicustomermanagement.onrender.com
+
 ---
 
 ## Tech Stack
 
 | Layer      | Technology                                               |
 | ---------- | -------------------------------------------------------- |
-| Frontend   | React 19, Tailwind CSS 3                                 |
+| Frontend   | React 19, Vite 8, Tailwind CSS 3                         |
 | Backend    | Node.js, Express 5                                       |
 | Runtime    | [Bun](https://bun.sh) (v1.0+)                           |
 | Validation | [Zod](https://zod.dev) (v4)                              |
 | Date/Time  | [Luxon](https://moment.github.io/luxon/) (Asia/Kolkata)  |
 | Logging    | Morgan                                                   |
 | Storage    | In-memory array (no database)                            |
+| Hosting    | Render                                                   |
 
 ---
 
@@ -36,22 +41,28 @@ CustomerManagement/
 │   │   └── errorHandler.js        # 404 handler + global error handler
 │   └── utils/
 │       ├── corsOptions.js         # CORS origin whitelist from env
-│       ├── generateId.js          # Short hex ID generator
+│       ├── generateId.js          # UUID generator
 │       ├── gracefulShutdown.js    # SIGTERM/SIGINT + uncaught error handling
 │       └── httpError.js           # Custom HTTP error class
 ├── client/                        # Frontend React app
 │   ├── .env                       # VITE_API_URL
+│   ├── vite.config.js             # Vite configuration
 │   ├── tailwind.config.js         # Tailwind theme with CSS variable references
+│   ├── postcss.config.js          # PostCSS plugins (Tailwind, Autoprefixer)
 │   └── src/
-│       ├── App.js                 # Main dashboard layout and state
+│       ├── App.jsx                # Root component — state management and layout
 │       ├── App.css                # Tailwind directives + CSS variables (theming)
+│       ├── main.jsx               # Entry point
 │       ├── components/
-│       │   ├── Icons.js           # SVG icon components
-│       │   ├── CustomerForm.js    # Add customer form with validation
-│       │   ├── CustomerRow.js     # Table row with delete action
-│       │   ├── ConfirmModal.js    # Delete confirmation dialog
-│       │   ├── TweaksPanel.js     # Theme/layout settings panel
-│       │   └── Toasts.js          # Auto-dismissing notifications
+│       │   ├── Icons.jsx          # SVG icon components
+│       │   ├── Topbar.jsx         # Brand, search bar, settings button
+│       │   ├── CustomerForm.jsx   # Add customer form with validation
+│       │   ├── CustomerTable.jsx  # Table with header, rows, and pagination
+│       │   ├── CustomerRow.jsx    # Single table row with delete action
+│       │   ├── ConfirmModal.jsx   # Delete confirmation dialog
+│       │   ├── Pagination.jsx     # Reusable pagination controls
+│       │   ├── TweaksPanel.jsx    # Theme/layout settings panel
+│       │   └── Toasts.jsx         # Auto-dismissing notifications
 │       └── utils/
 │           └── helpers.js         # API URL, initials(), fmtDate()
 └── README.md
@@ -62,7 +73,7 @@ CustomerManagement/
 ## Prerequisites
 
 - **Bun** v1.0 or later — [install guide](https://bun.sh/docs/installation)
-- **Node.js** v18 or later (for the React dev server)
+- **Node.js** v18 or later (for Vite dev server)
 
 ---
 
@@ -121,10 +132,10 @@ bun start
 
 # Terminal 2 — Frontend (port 3000)
 cd client
-npm start
+npm run dev
 ```
 
-The React app opens automatically at **http://localhost:3000**.
+The app opens automatically at **http://localhost:3000**.
 
 ---
 
@@ -186,9 +197,11 @@ Response: `200 OK` with the deleted customer object, or `404` if not found.
 
 - **Add Customer Form** — validated inputs with real-time error clearing, 10-digit phone validation with auto `+91` prefix
 - **Customer Table** — displays name (with avatar initials), email (mailto link), phone, and date added (IST via Luxon)
-- **Search** — live search across name, email, and phone fields
+- **Pagination** — 10 rows per page with Prev/Next controls
+- **Search** — debounced (300ms) live search across name, email, and phone fields
 - **Delete** — confirmation modal before removing a customer
 - **Toast Notifications** — success/info feedback on add and delete
+- **Persisted Preferences** — tweaks settings saved to localStorage
 - **Tweaks Panel** (gear icon in topbar):
   - **Mode** — Light / Dark theme
   - **Accent** — Indigo / Emerald / Slate / Amber
@@ -203,8 +216,10 @@ Response: `200 OK` with the deleted customer object, or `404` if not found.
 - **In-memory storage** — data resets on server restart, as specified in the assignment. No database setup needed.
 - **Express 5** — native async error handling in route handlers, no need for wrapper middleware.
 - **Zod validation** — schema-based input validation with clear, per-field error messages returned to the client.
+- **Vite** — fast dev server with HMR, replaces deprecated Create React App.
 - **Tailwind CSS** — utility-first styling with CSS variables for dynamic theming (light/dark, accents).
 - **Luxon + Asia/Kolkata** — all "Added" dates are displayed in IST for consistent Indian timezone formatting.
+- **UUID** — `crypto.randomUUID()` for internal customer IDs, not exposed in the UI.
 - **CORS whitelist** — only the configured frontend origin can call the API (`CORS_ORIGINS` in `.env`).
 - **Graceful shutdown** — the server handles SIGTERM/SIGINT and drains connections before exiting.
 
@@ -221,8 +236,8 @@ Response: `200 OK` with the deleted customer object, or `404` if not found.
 
 ### Frontend (`client/`)
 
-| Command          | Description                    |
-| ---------------- | ------------------------------ |
-| `npm start`      | Start dev server on port 3000  |
-| `npm run build`  | Production build to `build/`   |
-| `npm test`       | Run test suite                 |
+| Command           | Description                    |
+| ----------------- | ------------------------------ |
+| `npm run dev`     | Start dev server on port 3000  |
+| `npm run build`   | Production build to `dist/`    |
+| `npm run preview` | Preview production build       |

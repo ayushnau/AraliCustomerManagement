@@ -6,7 +6,7 @@ const HttpError = require("../utils/httpError");
 
 const router = express.Router();
 
-const customers = [];
+const customers = [{"id":"d8d9d8f9-1cc8-4e8a-abd9-f491e9ede101","name":"Ayush Nautiyal","email":"ayushnautiyaldevelopr@gmail.com","phone":"+91 8532949512","createdAt":"2026-04-28T01:58:00.889Z"}];
 
 const customerSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(255, "Name is too long"),
