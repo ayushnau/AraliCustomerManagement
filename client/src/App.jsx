@@ -11,6 +11,7 @@ const PAGE_SIZE = 10;
 
 export default function App() {
   const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [toasts, setToasts] = useState([]);
@@ -38,10 +39,12 @@ export default function App() {
   }, []);
 
   const fetchCustomers = useCallback(async (query = "") => {
+    setLoading(true);
     const url = query ? `${API}?q=${encodeURIComponent(query)}` : API;
     const res = await fetch(url);
     const data = await res.json();
     setCustomers(data);
+    setLoading(false);
   }, []);
 
   const debounceRef = useRef(null);
@@ -111,6 +114,7 @@ export default function App() {
           <CustomerTable
             customers={paged}
             startIndex={startIndex}
+            loading={loading}
             onDelete={handleDeleted}
             compact={isCompact}
             page={safePage}

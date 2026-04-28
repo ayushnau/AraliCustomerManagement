@@ -1,7 +1,8 @@
 import CustomerRow from "./CustomerRow";
 import Pagination from "./Pagination";
+import Spinner from "./Spinner";
 
-export default function CustomerTable({ customers, startIndex, onDelete, compact, page, totalPages, total, pageSize, onPageChange }) {
+export default function CustomerTable({ customers, startIndex, loading, onDelete, compact, page, totalPages, total, pageSize, onPageChange }) {
   return (
     <div className="bg-surface border border-border rounded-[10px] overflow-hidden">
       {/* Table header */}
@@ -28,7 +29,13 @@ export default function CustomerTable({ customers, startIndex, onDelete, compact
             </tr>
           </thead>
           <tbody>
-            {customers.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-10 px-4">
+                  <Spinner size={24} className="mx-auto" />
+                </td>
+              </tr>
+            ) : customers.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-10 px-4 text-text-3 text-sm">
                   No customers yet — add one using the form.

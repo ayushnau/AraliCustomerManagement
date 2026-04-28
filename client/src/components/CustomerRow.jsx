@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { API, initials, fmtDate } from "../utils/helpers";
 import { TrashIcon } from "./Icons";
+import Spinner from "./Spinner";
 import ConfirmModal from "./ConfirmModal";
 
 export default function CustomerRow({ customer, index, onDelete, compact }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
+    setDeleting(true);
     await fetch(`${API}/${customer.id}`, { method: "DELETE" });
     setShowConfirm(false);
     onDelete();
@@ -37,12 +40,13 @@ export default function CustomerRow({ customer, index, onDelete, compact }) {
         <td className="px-4 whitespace-nowrap text-[12.5px] text-text-3">{fmtDate(customer.createdAt)}</td>
         <td className="pr-5 pl-4 whitespace-nowrap text-right">
           <button
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-transparent rounded-md bg-transparent text-text-3 cursor-pointer text-xs font-sans transition-all duration-150 hover:text-danger hover:bg-danger-light"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-transparent rounded-md bg-transparent text-text-3 cursor-pointer text-xs font-sans transition-all duration-150 hover:text-danger hover:bg-danger-light disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={`Delete ${customer.name}`}
             onClick={() => setShowConfirm(true)}
+            disabled={deleting}
           >
-            <TrashIcon />
-            <span>Delete</span>
+            {deleting ? <Spinner size={14} /> : <TrashIcon />}
+            <span>{deleting ? "Deleting..." : "Delete"}</span>
           </button>
         </td>
       </tr>

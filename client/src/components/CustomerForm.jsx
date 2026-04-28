@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
 import { API } from "../utils/helpers";
+import Spinner from "./Spinner";
 
 export default function CustomerForm({ onAdded }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
   const nameRef = useRef(null);
 
   const validate = () => {
@@ -23,6 +25,7 @@ export default function CustomerForm({ onAdded }) {
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
+    setSubmitting(true);
     const payload = {
       ...form,
       phone: "+91 " + form.phone.replace(/\s/g, ""),
@@ -42,6 +45,7 @@ export default function CustomerForm({ onAdded }) {
       const data = await res.json();
       setErrors({ form: data.error || "Failed to add customer" });
     }
+    setSubmitting(false);
   };
 
   const handleChange = (e) => {
@@ -115,9 +119,10 @@ export default function CustomerForm({ onAdded }) {
 
       <button
         type="submit"
-        className="w-full h-10 bg-accent text-accent-text rounded-md text-sm font-medium border-none cursor-pointer font-sans transition-colors duration-150 hover:bg-accent-hover active:scale-[0.98]"
+        disabled={submitting}
+        className="w-full h-10 bg-accent text-accent-text rounded-md text-sm font-medium border-none cursor-pointer font-sans transition-colors duration-150 hover:bg-accent-hover active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
       >
-        Add customer
+        {submitting ? <><Spinner size={16} className="text-accent-text" /> Adding...</> : "Add customer"}
       </button>
 
       <div className="mt-4 text-center">
