@@ -4,7 +4,7 @@ A full-stack web application for managing customers. Add, view, search, and dele
 
 ## Demo
 
-> Loom walkthrough: _[paste your Loom link here]_
+> Loom walkthrough: https://www.loom.com/share/4d2bd3488ab7454ab2256fb48ed3cff9
 
 **Live URLs:**
 - Frontend: https://customerfrontend.onrender.com
@@ -45,7 +45,7 @@ CustomerManagement/
 │       ├── gracefulShutdown.js    # SIGTERM/SIGINT + uncaught error handling
 │       └── httpError.js           # Custom HTTP error class
 ├── client/                        # Frontend React app
-│   ├── .env                       # VITE_API_URL
+│   ├── .env.example               # VITE_API_URL
 │   ├── vite.config.js             # Vite configuration
 │   ├── tailwind.config.js         # Tailwind theme with CSS variable references
 │   ├── postcss.config.js          # PostCSS plugins (Tailwind, Autoprefixer)
@@ -72,8 +72,8 @@ CustomerManagement/
 
 ## Prerequisites
 
-- **Bun** v1.0 or later — [install guide](https://bun.sh/docs/installation)
-- **Node.js** v18 or later (for Vite dev server)
+- **Bun** v1.0 or later
+- **Node.js** v18 or later (frontend)
 
 ---
 
